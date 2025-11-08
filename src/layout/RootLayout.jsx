@@ -1,6 +1,8 @@
 import { Outlet } from "react-router-dom";
+import useAuthInitializer from "../services/useAuthInitializer";
 
 const RootLayout = () => {
+  useAuthInitializer();
   return (
     <>
       <div className={`h-screen flex flex-col`}>
