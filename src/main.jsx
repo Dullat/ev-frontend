@@ -13,11 +13,15 @@ import {
 
 import RootLayout from "./layout/RootLayout.jsx";
 import Map from "./pages/Map.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
+import LoginPage from "./features/user/LoginPage.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
       <Route index element={<Map />} />
+      <Route path="profile" element={<ProfilePage />} />
+      <Route path="login" element={<LoginPage />} />
     </Route>,
   ),
 );
