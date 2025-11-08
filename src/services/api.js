@@ -9,10 +9,9 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.status === 403) {
-    console.log("Sending refresh token");
+  if (result?.error?.status === 401) {
     const refreshedResult = await baseQuery(
-      { url: "/auth/refresh" },
+      { url: "/auth/refresh", method: "POST" },
       api,
       extraOptions,
     );
