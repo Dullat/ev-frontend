@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import Header from "../components/Header";
 import useAuthInitializer from "../services/useAuthInitializer";
 
 const RootLayout = () => {
@@ -6,7 +7,7 @@ const RootLayout = () => {
   return (
     <>
       <div className={`h-screen flex flex-col`}>
-        <header>this is header</header>
+        <Header />
         <div className={`flex-1`}>
           <Outlet />
         </div>
