@@ -28,7 +28,7 @@ const CheckboxGroup = ({ label, options, name, defaultValues = [] }) => {
               key={option.value}
               type="button"
               onClick={() => toggleValue(option.value)}
-              className={`flex items-center gap-3 p-4 rounded border transition-all duration-200 text-left ${
+              className={`flex items-center gap-3 p-4 cursor-pointer rounded border transition-all duration-200 text-left ${
                 isSelected
                   ? "bg-gradient-to-r from-blue-50 to-blue-100 border-blue-500 shadow-md shadow-blue-500/20"
                   : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm"
