@@ -14,7 +14,7 @@ const CheckboxGroup = ({ label, options, name, defaultValues = [] }) => {
 
   return (
     <div className="w-full">
-      {label && <label className="label">{label}</label>}
+      {label && <label className="label mb-2">{label}</label>}
 
       {selectedValues.map((value) => (
         <input key={value} type="hidden" name={name} value={value} />

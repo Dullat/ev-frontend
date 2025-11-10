@@ -39,7 +39,7 @@ const StandardDropDown = ({
         >
           <span
             className={
-              selectedValue ? "text-slate-800 font-medium" : "text-slate-400"
+              selectedValue ? "text-slate-800 font-medium" : "text-slate-600"
             }
           >
             {selectedOption?.label || placeholder}
