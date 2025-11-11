@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Unplug,
   EvCharger,
@@ -7,18 +8,122 @@ import {
   ChartColumnStacked,
   SatelliteDish,
   DollarSign,
+  ServerCrash,
+  Globe,
+  User,
 } from "lucide-react";
 import { Form } from "react-router-dom";
 import StandardInput from "../../components/StandardInput";
 import StandardDropDown from "../../components/StandardDropDown";
 import StandardCheckBoxGroup from "../../components/StandradCheckBoxGroup";
+import { useAddStationMutation } from "./stationApi";
+import { FormHeaderError } from "../../components/Errors";
+
+const validateURL = (value) => {
+  if (!value) return "URL is required";
+
+  try {
+    const url = new URL(value);
+    if (!url.hostname.includes(".")) {
+      return "URL must include a domain (e.g., .com, .org)";
+    }
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return "URL must start with http:// or https://";
+    }
+    return true;
+  } catch (err) {
+    return "Invalid URL format";
+  }
+};
 
 const AddStation = () => {
+  const [addStation, { data, error, isLoading, isSuccess, isError }] =
+    useAddStationMutation();
+
+  const [errorMessage, setErrorMessage] = React.useState(null);
+  const [emptyFields, setEmptyFields] = React.useState([]);
+
+  const [fieldValidity, setFieldValidity] = React.useState({});
+
   const plugTypes = [
-    { value: "ec2", label: "EC2" },
-    { value: "emac2", label: "Emac2" },
-    { value: "ahdf", label: "kadf" },
+    { value: "Type2", label: "Type 2 (AC, common in India)" },
+    { value: "CCS2", label: "CCS2 (Fast DC, modern EVs)" },
+    { value: "CHAdeMO", label: "CHAdeMO (Japanese DC fast charger)" },
+    { value: "GB/T", label: "GB/T (Bharat DC-001 chargers)" },
+    { value: "BharatAC001", label: "Bharat AC-001 (AC for light EVs)" },
+    { value: "BharatDC001", label: "Bharat DC-001 (DC for light EVs)" },
   ];
+
+  const handleFieldValidation = (name, isValid) => {
+    setFieldValidity((prev) => ({ ...prev, [name]: isValid }));
+  };
+
+  const handleSubmit = async (e) => {
+    const formData = new FormData(e.target);
+    const plugTypes = formData.getAll("plugTypes");
+
+    const {
+      name,
+      street,
+      city,
+      state,
+      country,
+      chargerType,
+      pricePerKwh,
+      ownerName,
+      ownerLink,
+    } = Object.fromEntries(formData);
+
+    const requiredFields = [
+      "name",
+      "street",
+      "city",
+      "state",
+      "country",
+      "chargerType",
+      "pricePerKwh",
+      "ownerLink",
+      "ownerName",
+    ];
+
+    const empty = requiredFields.filter((f) => !formData.get(f));
+
+    if (empty.length > 0) {
+      setEmptyFields(empty);
+      setErrorMessage("Please fill in all the fields...");
+      return;
+    } else {
+      setErrorMessage(null);
+      setEmptyFields([]);
+    }
+
+    const allValid = Object.values(fieldValidity).every(Boolean);
+    if (!allValid) {
+      setErrorMessage("Please fix invalid fields before submitting.");
+      return;
+    }
+
+    try {
+      const res = await addStation({
+        name,
+        street,
+        city,
+        state,
+        country,
+        chargerType,
+        pricePerKwh,
+        ownerName,
+        ownerLink,
+      }).unwrap();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  React.useEffect(() => {
+    isError && setErrorMessage(error.data.error);
+    isSuccess && setErrorMessage(null);
+  }, [isError, fieldValidity]);
 
   return (
     <div className="w-full h-full flex items-center justify-center">
@@ -38,7 +143,13 @@ const AddStation = () => {
         </div>
 
         <div className="animate-slide-up w-full">
-          <Form className="flex flex-col space-y-4">
+          <Form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+            {errorMessage && (
+              <FormHeaderError
+                message={errorMessage}
+                onClose={setErrorMessage}
+              />
+            )}
             <div className="flex flex-col">
               {/* <h2 className="text-slate-600 font-bold text-xl">Name:</h2> */}
               <StandardInput
@@ -46,6 +157,7 @@ const AddStation = () => {
                 placeholder={"Your Station's name"}
                 label={"Station Name"}
                 Icon={EvCharger}
+                isEmpty={emptyFields.includes("name")}
               />
             </div>
 
@@ -54,16 +166,36 @@ const AddStation = () => {
               <div className="space-y-4 flex flex-col w-full">
                 <div className="flex flex-col w-full md:flex-row gap-4">
                   <StandardInput
+                    name={"ownerName"}
+                    placeholder={"Who owns this station"}
+                    label={"Owner Name"}
+                    Icon={User}
+                    isEmpty={emptyFields.includes("ownerName")}
+                  />
+                  <StandardInput
+                    name={"ownerLink"}
+                    placeholder={"https://example.com"}
+                    label={"Owner Link"}
+                    Icon={Globe}
+                    isEmpty={emptyFields.includes("ownerLink")}
+                    validate={validateURL}
+                    onValidateChange={handleFieldValidation}
+                  />
+                </div>
+                <div className="flex flex-col w-full md:flex-row gap-4">
+                  <StandardInput
                     name={"street"}
                     placeholder={"Street name"}
                     label={"Street"}
                     Icon={UtilityPole}
+                    isEmpty={emptyFields.includes("street")}
                   />
                   <StandardInput
                     name={"city"}
                     placeholder={"City name"}
                     label={"City"}
                     Icon={Building2}
+                    isEmpty={emptyFields.includes("city")}
                   />
                 </div>
                 <div className="flex flex-col w-full md:flex-row space-y-4 space-x-4">
@@ -72,12 +204,14 @@ const AddStation = () => {
                     placeholder={"State name"}
                     label={"State"}
                     Icon={ChartColumnStacked}
+                    isEmpty={emptyFields.includes("state")}
                   />
                   <StandardInput
                     name={"country"}
                     placeholder={"Country name"}
                     label={"Country"}
                     Icon={SatelliteDish}
+                    isEmpty={emptyFields.includes("country")}
                   />
                 </div>
               </div>
@@ -93,13 +227,15 @@ const AddStation = () => {
                     { value: "normal", label: "Normal" },
                   ]}
                   placeholder={"Select a charger type"}
-                  defaultValue={""}
+                  defaultValue={"normal"}
                 />
                 <StandardInput
                   name={"pricePerKwh"}
                   placeholder={"Price per Kwh"}
                   label={"Price"}
                   Icon={DollarSign}
+                  type={"number"}
+                  isEmpty={emptyFields.includes("pricePerKwh")}
                 />
               </div>
             </div>
