@@ -8,9 +8,17 @@ const stationApi = stationApiBase.injectEndpoints({
         params: { lat, lon, rad },
       }),
     }),
+    addStation: builder.mutation({
+      query: (stationData) => ({
+        url: "/station",
+        method: "POST",
+        body: stationData,
+      }),
+    }),
   }),
 });
 
-export const { useLazyGetStationByCoordsQuery } = stationApi;
+export const { useLazyGetStationByCoordsQuery, useAddStationMutation } =
+  stationApi;
 
 export default stationApi;
