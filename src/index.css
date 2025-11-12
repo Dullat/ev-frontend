@@ -31,15 +31,15 @@
      ========================================== */
   
   .btn-primary {
-    @apply bg-gradient-to-r cursor-pointer from-emerald-500 to-teal-600 text-white px-6 py-3 rounded font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-102 transition-all duration-200;
+    @apply bg-gradient-to-r cursor-pointer from-emerald-500 to-teal-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-102 transition-all duration-200;
   }
   
   .btn-secondary {
-    @apply bg-gradient-to-r cursor-pointer from-blue-500 to-indigo-600 text-white px-6 py-3 rounded font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-102 transition-all duration-200;
+    @apply bg-gradient-to-r cursor-pointer from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-102 transition-all duration-200;
   }
   
   .btn-accent {
-    @apply bg-gradient-to-r cursor-pointer from-violet-500 to-purple-600 text-white px-6 py-3 rounded font-semibold shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 hover:scale-102 transition-all duration-200;
+    @apply bg-gradient-to-r cursor-pointer from-violet-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 hover:scale-102 transition-all duration-200;
   }
   
   /* ==========================================

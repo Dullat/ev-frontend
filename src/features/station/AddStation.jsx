@@ -246,10 +246,10 @@ const AddStation = () => {
               defaultValue={[]}
             />
             <div className="w-full flex flex-col md:flex-row gap-4 mt-2">
-              <button type="none" className="btn-accent w-full">
+              <button type="none" className="btn-accent rounded w-full">
                 Cancle
               </button>
-              <button type="submit" className="btn-secondary w-full">
+              <button type="submit" className="btn-secondary rounded w-full">
                 Add Station
               </button>
             </div>
