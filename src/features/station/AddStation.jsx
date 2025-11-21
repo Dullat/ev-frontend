@@ -12,7 +12,7 @@ import {
   Globe,
   User,
 } from "lucide-react";
-import { Form } from "react-router-dom";
+import { Form, useParams, useNavigate } from "react-router-dom";
 import StandardInput from "../../components/StandardInput";
 import StandardDropDown from "../../components/StandardDropDown";
 import StandardCheckBoxGroup from "../../components/StandradCheckBoxGroup";
@@ -44,6 +44,10 @@ const AddStation = () => {
   const [emptyFields, setEmptyFields] = React.useState([]);
 
   const [fieldValidity, setFieldValidity] = React.useState({});
+
+  const { lat, lon } = useParams();
+
+  const navigate = useNavigate();
 
   const plugTypes = [
     { value: "Type2", label: "Type 2 (AC, common in India)" },
@@ -114,7 +118,10 @@ const AddStation = () => {
         pricePerKwh,
         ownerName,
         ownerLink,
+        coordinates: { lat, lon },
       }).unwrap();
+
+      navigate(`/${lat}/${lon}`);
     } catch (error) {
       console.log(error);
     }

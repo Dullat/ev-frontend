@@ -19,11 +19,11 @@ import AddStation from "./features/station/AddStation.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<RootLayout />}>
+    <Route path="/:lat?/:lon?" element={<RootLayout />}>
       <Route index element={<Map />} />
       <Route path="profile" element={<ProfilePage />} />
       <Route path="login" element={<LoginPage />} />
-      <Route path="addstation" element={<AddStation />} />
+      <Route path="addstation/:lat/:lon" element={<AddStation />} />
     </Route>,
   ),
 );
