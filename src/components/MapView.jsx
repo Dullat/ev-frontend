@@ -7,6 +7,8 @@ import { useLazyGetStationByCoordsQuery } from "../features/station/stationApi";
 import BottomSheet from "./BottomSheet.jsx";
 import useUserLocation from "../hooks/useUserLocation.jsx";
 import userIcon from "./userIcon.js";
+import MapClickHandler from "./MapClickHandler.jsx";
+import { useParams } from "react-router-dom";
 
 const MapEventHandler = ({ onBoundsChange, onUserPan }) => {
   const map = useMap();
@@ -86,6 +88,10 @@ const MapView = () => {
   const { position } = useUserLocation();
   const [followUser, setFollowUser] = React.useState(true);
 
+  const [clickPosition, setClickPostion] = React.useState(null);
+
+  const { lat, lon } = useParams();
+
   const fetchStations = React.useCallback(
     async ({ lat, lng, rad }) => {
       clearTimeout(debounceRef?.current);
@@ -120,10 +126,15 @@ const MapView = () => {
     return () => clearTimeout(debounceRef?.current);
   }, []);
 
+  React.useEffect(() => {
+    if (lat && lon) {
+      setFollowUser(false);
+    }
+  });
   return (
     <>
       <MapContainer
-        center={[30.76, 76.78]}
+        center={[lat || 30.76, lon || 76.78]}
         zoom={13}
         className={`h-full w-full`}
       >
@@ -135,6 +146,12 @@ const MapView = () => {
         <MapEventHandler
           onBoundsChange={handleBoundsChange}
           onUserPan={() => setFollowUser(false)}
+        />
+
+        <MapClickHandler
+          onMapClick={(p) => console.log(p)}
+          clickPosition={clickPosition}
+          setClickPosition={setClickPostion}
         />
 
         {data?.stations?.map((station) => (
