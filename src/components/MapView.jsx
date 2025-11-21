@@ -8,7 +8,7 @@ import BottomSheet from "./BottomSheet.jsx";
 import useUserLocation from "../hooks/useUserLocation.jsx";
 import userIcon from "./userIcon.js";
 import MapClickHandler from "./MapClickHandler.jsx";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const MapEventHandler = ({ onBoundsChange, onUserPan }) => {
   const map = useMap();
@@ -91,6 +91,7 @@ const MapView = () => {
   const [clickPosition, setClickPostion] = React.useState(null);
 
   const { lat, lon } = useParams();
+  const navigate = useNavigate();
 
   const fetchStations = React.useCallback(
     async ({ lat, lng, rad }) => {
@@ -129,8 +130,17 @@ const MapView = () => {
   React.useEffect(() => {
     if (lat && lon) {
       setFollowUser(false);
+      if (data?.stations) {
+        const station = data.stations.find(
+          (station) =>
+            station.location.coordinates[0] === Number(lon) &&
+            station.location.coordinates[1] === Number(lat),
+        );
+
+        setSelectedStation(station);
+      }
     }
-  });
+  }, [lat, lon, data]);
   return (
     <>
       <MapContainer
@@ -182,7 +192,10 @@ const MapView = () => {
         <BottomSheet
           station={selectedStation}
           isOpen={!!selectedStation}
-          onClose={() => setSelectedStation(null)}
+          onClose={() => {
+            setSelectedStation(null);
+            if (lat && lon) navigate("/");
+          }}
         />
       )}{" "}
       <button
