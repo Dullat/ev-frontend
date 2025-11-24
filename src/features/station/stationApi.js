@@ -15,10 +15,18 @@ const stationApi = stationApiBase.injectEndpoints({
         body: stationData,
       }),
     }),
+    searchStationByQuery: builder.query({
+      query: (q) => ({
+        url: `station/search?q=${q}`,
+      }),
+    }),
   }),
 });
 
-export const { useLazyGetStationByCoordsQuery, useAddStationMutation } =
-  stationApi;
+export const {
+  useLazyGetStationByCoordsQuery,
+  useAddStationMutation,
+  useLazySearchStationByQueryQuery,
+} = stationApi;
 
 export default stationApi;
