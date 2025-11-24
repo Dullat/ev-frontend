@@ -10,7 +10,7 @@ import userIcon from "./userIcon.js";
 import MapClickHandler from "./MapClickHandler.jsx";
 import { useParams, useNavigate } from "react-router-dom";
 
-const MapEventHandler = ({ onBoundsChange, onUserPan }) => {
+const MapEventHandler = ({ onBoundsChange, onUserPan, setSelectedStation }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -37,6 +37,7 @@ const MapEventHandler = ({ onBoundsChange, onUserPan }) => {
 
     const handleDragStart = () => {
       if (onUserPan) onUserPan();
+      setSelectedStation(null);
     };
 
     map.on("moveend", handleMoveEnd);
@@ -147,6 +148,7 @@ const MapView = () => {
         center={[lat || 30.76, lon || 76.78]}
         zoom={13}
         className={`h-full w-full`}
+        zoomControl={false}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
@@ -156,6 +158,7 @@ const MapView = () => {
         <MapEventHandler
           onBoundsChange={handleBoundsChange}
           onUserPan={() => setFollowUser(false)}
+          setSelectedStation={setSelectedStation}
         />
 
         <MapClickHandler
