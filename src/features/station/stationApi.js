@@ -24,6 +24,7 @@ const stationApi = stationApiBase.injectEndpoints({
 });
 
 export const {
+  useGetStationByCoordsQuery,
   useLazyGetStationByCoordsQuery,
   useAddStationMutation,
   useLazySearchStationByQueryQuery,

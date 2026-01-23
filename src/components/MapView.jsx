@@ -3,14 +3,22 @@ import { LocateFixed, LocateOff, Locate } from "lucide-react";
 import React, { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
-import { useLazyGetStationByCoordsQuery } from "../features/station/stationApi";
+import {
+  useLazyGetStationByCoordsQuery,
+  useGetStationByCoordsQuery,
+} from "../features/station/stationApi";
 import BottomSheet from "./BottomSheet.jsx";
 import useUserLocation from "../hooks/useUserLocation.jsx";
 import userIcon from "./userIcon.js";
 import MapClickHandler from "./MapClickHandler.jsx";
 import { useParams, useNavigate } from "react-router-dom";
 
-const MapEventHandler = ({ onBoundsChange, onUserPan, setSelectedStation }) => {
+const MapEventHandler = ({
+  removeLatLon,
+  onBoundsChange,
+  onUserPan,
+  setSelectedStation,
+}) => {
   const map = useMap();
 
   useEffect(() => {
@@ -38,6 +46,7 @@ const MapEventHandler = ({ onBoundsChange, onUserPan, setSelectedStation }) => {
     const handleDragStart = () => {
       if (onUserPan) onUserPan();
       setSelectedStation(null);
+      removeLatLon();
     };
 
     map.on("moveend", handleMoveEnd);
@@ -80,11 +89,43 @@ const RecenterOnUser = ({ position, follow }) => {
   return null;
 };
 
+const MapController = ({
+  lat,
+  lon,
+  data,
+  setSelectedStation,
+  setFollowUser,
+  selectedStation,
+}) => {
+  const map = useMap();
+
+  React.useEffect(() => {
+    if (!map) return;
+    if (lat && lon) {
+      setFollowUser(false);
+      if (data?.stations) {
+        const station = data.stations.find(
+          (station) =>
+            station.location.coordinates[0] === Number(lon) &&
+            station.location.coordinates[1] === Number(lat),
+        );
+
+        map.flyTo([Number(lat), Number(lon)], 16);
+      }
+    }
+  }, [lat, lon, data?.stations]);
+};
+
 const MapView = () => {
+  const mapRef = React.useRef(null);
   const [selectedStation, setSelectedStation] = React.useState(null);
-  const [getStationByCoords, { data, isLoading, isSuccess, isError, error }] =
-    useLazyGetStationByCoordsQuery();
+  const [queryParams, setQueryParams] = React.useState(null);
+  const { data, isLoading, isError, error } = useGetStationByCoordsQuery(
+    queryParams,
+    { skip: !queryParams }, // Skip if no params set
+  );
   const debounceRef = React.useRef(null);
+  const requestRef = React.useRef(null);
 
   const { position } = useUserLocation();
   const [followUser, setFollowUser] = React.useState(true);
@@ -94,28 +135,19 @@ const MapView = () => {
   const { lat, lon } = useParams();
   const navigate = useNavigate();
 
-  const fetchStations = React.useCallback(
-    async ({ lat, lng, rad }) => {
-      clearTimeout(debounceRef?.current);
+  const fetchStations = React.useCallback(({ lat, lng, rad }) => {
+    clearTimeout(debounceRef.current);
+
+    if (!lat || !lng || !rad) return;
+    setSelectedStation(null);
+
+    debounceRef.current = setTimeout(() => {
+      // Simply update the query params - RTK Query handles everything
+      setQueryParams({ lat, lon: lng, rad });
       setSelectedStation(null);
-
-      if (!lat || !lng || !rad) return;
-
-      debounceRef.current = setTimeout(async () => {
-        try {
-          const data = await getStationByCoords({
-            lat,
-            lon: lng,
-            rad,
-          }).unwrap();
-          console.log(data);
-        } catch (error) {
-          console.log(error);
-        }
-      }, 1000);
-    },
-    [getStationByCoords],
-  );
+      console.log("debounced......", selectedStation);
+    }, 500);
+  }, []);
 
   const handleBoundsChange = React.useCallback(
     (mapInfo) => {
@@ -129,19 +161,9 @@ const MapView = () => {
   }, []);
 
   React.useEffect(() => {
-    if (lat && lon) {
-      setFollowUser(false);
-      if (data?.stations) {
-        const station = data.stations.find(
-          (station) =>
-            station.location.coordinates[0] === Number(lon) &&
-            station.location.coordinates[1] === Number(lat),
-        );
+    if (isLoading) setSelectedStation(null);
+  }, [selectedStation, isLoading]);
 
-        setSelectedStation(station);
-      }
-    }
-  }, [lat, lon, data]);
   return (
     <>
       <MapContainer
@@ -159,12 +181,25 @@ const MapView = () => {
           onBoundsChange={handleBoundsChange}
           onUserPan={() => setFollowUser(false)}
           setSelectedStation={setSelectedStation}
+          removeLatLon={() => {
+            if (lat || lon) navigate("/");
+          }}
         />
 
         <MapClickHandler
           onMapClick={(p) => console.log(p)}
           clickPosition={clickPosition}
           setClickPosition={setClickPostion}
+          setSelectedStation={setSelectedStation}
+        />
+
+        <MapController
+          lat={lat}
+          lon={lon}
+          setSelectedStation={setSelectedStation}
+          selectedStation={selectedStation}
+          setFollowUser={setFollowUser}
+          data={data}
         />
 
         {data?.stations?.map((station) => (
@@ -176,7 +211,9 @@ const MapView = () => {
               station.location.coordinates[0],
             ]}
             eventHandlers={{
-              click: () => setSelectedStation(station),
+              click: () => {
+                setSelectedStation(station);
+              },
             }}
           ></Marker>
         ))}
@@ -192,17 +229,23 @@ const MapView = () => {
         )}
       </MapContainer>
       {selectedStation && (
-        <BottomSheet
-          station={selectedStation}
-          isOpen={!!selectedStation}
-          onClose={() => {
-            setSelectedStation(null);
-            if (lat && lon) navigate("/");
-          }}
-        />
+        <>
+          {/* <div className="absolute inset-0 h-full w-full z-[1000]"></div> */}
+          <BottomSheet
+            station={selectedStation}
+            isOpen={!!selectedStation}
+            onClose={() => {
+              setSelectedStation(null);
+              if (lat && lon) navigate("/");
+            }}
+          />
+        </>
       )}{" "}
       <button
-        onClick={() => setFollowUser((prev) => !prev)}
+        onClick={() => {
+          if (lat || lon) navigate("/");
+          setFollowUser((prev) => !prev);
+        }}
         className="absolute bottom-5 right-5 bg-white shadow-md rounded-full p-3 z-[1001]"
       >
         {followUser && position ? (

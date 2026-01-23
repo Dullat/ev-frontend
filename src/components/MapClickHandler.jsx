@@ -6,6 +6,7 @@ const MapClickHandler = ({
   clickPosition,
   setClickPosition,
   minZoom = 14,
+  setSelectedStation,
 }) => {
   const map = useMapEvents({
     click(e) {
@@ -14,6 +15,7 @@ const MapClickHandler = ({
       if (currentZoom < minZoom) return;
       setClickPosition(e.latlng);
       if (onMapClick) onMapClick(e.latlng);
+      setSelectedStation(null);
     },
   });
 
