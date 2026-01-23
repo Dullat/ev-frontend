@@ -18,6 +18,9 @@ import StandardDropDown from "../../components/StandardDropDown";
 import StandardCheckBoxGroup from "../../components/StandradCheckBoxGroup";
 import { useAddStationMutation } from "./stationApi";
 import { FormHeaderError } from "../../components/Errors";
+import { useSelector } from "react-redux";
+import { selectUser } from "../user/userSlice.js";
+import PleaseLogin from "../../components/PleaseLogin.jsx";
 
 const validateURL = (value) => {
   if (!value) return "URL is required";
@@ -44,6 +47,8 @@ const AddStation = () => {
   const [emptyFields, setEmptyFields] = React.useState([]);
 
   const [fieldValidity, setFieldValidity] = React.useState({});
+
+  const user = useSelector(selectUser);
 
   const { lat, lon } = useParams();
 
@@ -131,6 +136,8 @@ const AddStation = () => {
     isError && setErrorMessage(error.data.error);
     isSuccess && setErrorMessage(null);
   }, [isError, fieldValidity]);
+
+  if (!user) return <PleaseLogin />;
 
   return (
     <div className="w-full h-full flex items-center justify-center">

@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { selectUser } from "../features/user/userSlice";
 import { useLogOutMutation } from "../features/user/userApi";
+import PleaseLogin from "../components/PleaseLogin";
 import {
   Camera,
   Check,
@@ -28,7 +29,7 @@ const ProfilePage = () => {
     }
   };
 
-  if (!user) return <div>not logged in...</div>;
+  if (!user) return <PleaseLogin />;
   return (
     <div className="bg-page">
       <main className="max-w-3xl mx-auto px-4 py-8">
