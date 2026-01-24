@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import { useLazySearchStationByQueryQuery } from "../features/station/stationApi.js";
 import { EvCharger, Search as SearchIcon } from "lucide-react";
 
@@ -85,11 +85,12 @@ const Search = () => {
 };
 
 const Header = () => {
+  const location = useLocation();
   return (
     <header className="w-full header z-[1001]">
       <div className="h-16 flex  items-center p-4">
         {/* <p>Dullat's EV</p> */}
-        <Search />
+        {location.pathname === "/" && <Search />}
         <ul className="flex gap-4 ml-auto">
           <li>
             <NavLink
