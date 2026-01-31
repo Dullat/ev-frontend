@@ -3,7 +3,7 @@ import { NavLink, Link, useLocation } from "react-router-dom";
 import { useLazySearchStationByQueryQuery } from "../features/station/stationApi.js";
 import { EvCharger, Search as SearchIcon } from "lucide-react";
 
-const Search = () => {
+export const Search = () => {
   const [searchStationByQuery, { data, isLoading, isError, isSuccess, error }] =
     useLazySearchStationByQueryQuery();
   const [showList, setShowList] = React.useState(false);
@@ -90,7 +90,8 @@ const Header = () => {
     <header className="w-full header z-[1001]">
       <div className="h-16 flex  items-center p-4">
         {/* <p>Dullat's EV</p> */}
-        {location.pathname === "/" && <Search />}
+        {/* {location.pathname === "/" && <Search />} */}
+        <Search />
         <ul className="flex gap-4 ml-auto">
           <li>
             <NavLink

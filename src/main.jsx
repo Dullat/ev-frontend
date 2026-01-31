@@ -16,6 +16,7 @@ import Map from "./pages/Map.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import LoginPage from "./features/user/LoginPage.jsx";
 import AddStation from "./features/station/AddStation.jsx";
+import Home from "./pages/Home.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
       <Route path="profile" element={<ProfilePage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="addstation/:lat/:lon" element={<AddStation />} />
+      <Route path="home" element={<Home />} />
     </Route>,
   ),
 );
